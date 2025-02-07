@@ -48,6 +48,7 @@ class PDF(FPDF):
             self.ln(row_height)
 
     def chapter_image(self, image_path, width=180):
+        self.add_page()  # Start a new page
         with Image.open(image_path) as img:
             aspect_ratio = img.height / img.width
             height = width * aspect_ratio
@@ -56,7 +57,7 @@ class PDF(FPDF):
         self.image(image_path, x=10, y=current_y, w=width)
         self.ln(height + 10)
 
-def kMC(file_path, csv_file_path):
+def kMC(file_path, csv_file_path, attribute):
 
     # Load the dataset
     dataset = pd.read_csv(csv_file_path)
@@ -68,7 +69,7 @@ def kMC(file_path, csv_file_path):
     dataset['Gender'] = dataset['Gender'].map({'Male': 0, 'Female': 1})
 
     # Select relevant columns for clustering
-    data = dataset[['Gender', 'Age', 'Annual Income (k$)', 'Spending Score (1-100)']]
+    data = dataset[attribute].copy()
 
     # Define the stability analysis function
     def stability_analysis(X, range_n_clusters):
@@ -144,6 +145,23 @@ def kMC(file_path, csv_file_path):
     # Calculate descriptive statistics for each cluster
     cluster_stats = descriptive_statistics(data)
 
+    if len(attribute) <= 3:
+        fig = plt.figure(figsize=(10, 8))
+        if len(attribute) == 2:
+            plt.scatter(data.iloc[:, 0], data.iloc[:, 1], c=kmeans.labels_, cmap='viridis')
+            plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', marker='x')
+            plt.xlabel(data.columns[0])
+            plt.ylabel(data.columns[1])
+        elif len(attribute) == 3:
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(data.iloc[:, 0], data.iloc[:, 1], data.iloc[:, 2], c=kmeans.labels_, cmap='viridis')
+            ax.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], kmeans.cluster_centers_[:, 2], s=300, c='red', marker='x')
+            ax.set_xlabel(data.columns[0])
+            ax.set_ylabel(data.columns[1])
+            ax.set_zlabel(data.columns[2])
+        plt.title('Cluster Analysis')
+        plt.savefig('kMC_Cluster.png')
+
     if file_path != 'not needed':
 
         # Create PDF
@@ -170,15 +188,22 @@ def kMC(file_path, csv_file_path):
         pdf.chapter_title("Inertia:")
         pdf.chapter_body(str(kmeans.inertia_))
 
+        if len(attribute) <= 3:
+            pdf.chapter_title("Cluster-Verteilung:")
+            pdf.chapter_image('kMC_Cluster.png', width=180)
+
+
         # Add descriptive statistics for each cluster
         for cluster, stats in cluster_stats.items():
             pdf.chapter_title(f"Descriptive statistics for Cluster {cluster}:")
             pdf.add_table(stats)
 
         # Save the PDF
-        pdf.output(os.path.join(file_path, 'kMC_report.pdf'))
+        pdf.output(os.path.join(file_path, f'kMC_report_{attribute}.pdf'))
 
     os.remove('kMC.png')
+    if len(attribute) <= 3:
+        os.remove('kMC_Cluster.png')
 
     return data['Cluster'], kmeans.cluster_centers_
 

@@ -54,37 +54,11 @@ def summary_statistics (csv_file_path):
 
     return shape, summary
 
-def linear_regression (csv_file_path):
-
-    # Load the dataset
-    data = pd.read_csv(csv_file_path)
-
-    # set male and female to 0 and 1
-    data['Gender'] = data['Gender'].map({'Male': 0, 'Female': 1})
-    # List of attributes
-    attributes = ['Gender', 'Age', 'Annual Income (k$)', 'Spending Score (1-100)']
-
-    # Initialize a DataFrame to store the coefficients
-    coeff_matrix = pd.DataFrame(index=attributes, columns=attributes)
-
-    # Fit a LinearRegression model for each pair of attributes
-    for x_attr in attributes:
-        for y_attr in attributes:
-            if x_attr != y_attr:
-                X = data[[x_attr]]
-                y = data[y_attr]
-                model = LinearRegression()
-                model.fit(X, y)
-                coeff_matrix.loc[y_attr, x_attr] = model.coef_[0]
-            else:
-                coeff_matrix.loc[y_attr, x_attr] = 1.0  # Diagonal elements
-
-    return coeff_matrix
 
 def basic_data_analysis(file_path, csv_file_path):
 
     shape, summary = summary_statistics(csv_file_path)
-    regression_table = linear_regression(csv_file_path)
+
 
     pdf = PDF()
     pdf.add_page()
@@ -96,10 +70,6 @@ def basic_data_analysis(file_path, csv_file_path):
     # Add summary chapter
     pdf.chapter_title("Beschreibende Statistik")
     pdf.add_table(summary)
-
-    # Add regression table chapter
-    pdf.chapter_title("Regressionskoeffizienten")
-    pdf.add_table(regression_table)
 
     # Save the PDF to the given file path
     pdf.output(os.path.join(file_path, 'basic_data_analysis_report.pdf'))

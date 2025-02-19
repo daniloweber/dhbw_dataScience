@@ -2,11 +2,13 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 from functions.attributeAnalysis import attribute_analysis
 from functions.basicDataAnalysis import basic_data_analysis
+from functions.clusterAnalysis import cluster_analysis
 from functions.kMC import kMC
-from list_of_attributes import list_of_attributes
+from listOfAttributes import list_of_attributes
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +40,8 @@ def main():
     for attribute in list_of_attributes:
         kMC(result_folder, csv_file_path, attribute)
 
+    # Perform cluster analysis
+    cluster_analysis(result_folder, csv_file_path)
 
 if __name__ == "__main__":
     main()

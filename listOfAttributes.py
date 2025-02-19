@@ -1,4 +1,4 @@
-# list_of_attributes.py
+# list_of_attributes
 
 list_of_attributes = [
     ['Gender', 'Age', 'Annual Income (k$)', 'Spending Score (1-100)'],

@@ -10,7 +10,7 @@ def attribute_analysis(directory, csv_file_path):
 
     # Age Pyramid
     bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    labels = ['0-10', '11-20', '21-30', '31-40', '41-50', '51-60', '61-70', '71-80', '81-90', '91-100']
+    labels = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99']
     data['AgeGroup'] = pd.cut(data['Age'], bins=bins, labels=labels, right=False)
     grouped_data = data.groupby(['AgeGroup', 'Gender'], observed=False).size().unstack(fill_value=0)
     age_groups = labels

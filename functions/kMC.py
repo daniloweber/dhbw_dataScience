@@ -205,5 +205,5 @@ def kMC(file_path, csv_file_path, attribute):
     if len(attribute) <= 3:
         os.remove('kMC_Cluster.png')
 
-    return data['Cluster'], kmeans.cluster_centers_
+    return data
 
